@@ -2,6 +2,8 @@ package kz.ata.saycheese.bot;
 
 import kz.ata.saycheese.config.BotConfig;
 import kz.ata.saycheese.constants.SaycheeseConstants;
+import kz.ata.saycheese.enums.InputType;
+import kz.ata.saycheese.service.SaycheeseService;
 import kz.ata.saycheese.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,24 +22,60 @@ public class SaycheeseBot extends TelegramLongPollingBot {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private SaycheeseService saycheeseService;
+
     @Override
     public void onUpdateReceived(Update update) {
         if (!checkAccessRights(update.getMessage().getChatId())){
-            SendMessage message =  new SendMessage(update.getMessage().getChatId(), SaycheeseConstants.ACCESS_DENIED);
-            send(message);
+            sendCustomKeyboard(update.getMessage().getChatId(), InputType.BASE, SaycheeseConstants.ACCESS_DENIED);
             return;
         }
         if (update.hasMessage() && update.getMessage().hasText()){
             System.out.println(update.getMessage().getText());
-            SendMessage message = new SendMessage();
-            message.setChatId(update.getMessage().getChatId());
-            message.setText("Hello World");
-            send(message);
+            String message = update.getMessage().getText();
+            long chat_id = update.getMessage().getChatId();
+            String out = "";
+            switch (message){
+                case SaycheeseConstants.ORDERS:
+                    out = "Выберите заказы";
+                    sendCustomKeyboard(chat_id, InputType.SUBORDERS, out);
+                    break;
+                case SaycheeseConstants.STORAGE:
+                    out = "Выберите действие со складом";
+                    sendCustomKeyboard(chat_id, InputType.SUBSTORAGE, out);
+                    break;
+                case SaycheeseConstants.SELL:
+                    out = "Выберите чизкейк";
+                    sendCustomKeyboard(chat_id, InputType.SUBSELLS, out);
+                    break;
+                case SaycheeseConstants.REPORTS:
+                    out = "Выберите период отчетности";
+                    sendCustomKeyboard(chat_id, InputType.SUBREPORTS, out);
+                    break;
+                default:
+                    out = "Выберите действие из меню";
+                    sendCustomKeyboard(chat_id, InputType.BASE, out);
+                    break;
+            }
         }
     }
 
-
-    private void send(SendMessage message){
+    public void sendCustomKeyboard(long chatId, InputType type, String msg) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(msg);
+        if (type.equals(InputType.SUBORDERS)){
+            message.setReplyMarkup(saycheeseService.createSubordersKeyboard());
+        }else if(type.equals(InputType.SUBSTORAGE)){
+            message.setReplyMarkup(saycheeseService.createSubstorageKeyboard());
+        }else if(type.equals(InputType.SUBSELLS)){
+            message.setReplyMarkup(saycheeseService.createSellKeyboard());
+        }else if(type.equals(InputType.SUBREPORTS)){
+            message.setReplyMarkup(saycheeseService.createSubreportsKeyboard());
+        }else {
+            message.setReplyMarkup(saycheeseService.createMainKeyboard());
+        }
         try {
             execute(message);
         } catch (TelegramApiException e) {
