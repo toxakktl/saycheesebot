@@ -5,5 +5,6 @@ public enum InputType {
     SUBORDERS,
     SUBREPORTS,
     SUBSTORAGE,
-    SUBSELLS;
+    SUBSELLS,
+    MAIN;
 }

@@ -53,11 +53,39 @@ public class SaycheeseBot extends TelegramLongPollingBot {
                     out = "Выберите период отчетности";
                     sendCustomKeyboard(chat_id, InputType.SUBREPORTS, out);
                     break;
+                case SaycheeseConstants.BACK:
+                    out = "Выберите действие";
+                    sendCustomKeyboard(chat_id, InputType.MAIN, out);
+                    break;
+                case SaycheeseConstants.ACTIVE_ORDERS:
+                    sendMessage(chat_id, SaycheeseConstants.ACTIVE_ORDERS);
+                    break;
+                case SaycheeseConstants.ADD_ORDER:
+                    sendMessage(chat_id, SaycheeseConstants.ADD_ORDER);
+                    break;
                 default:
-                    out = "Выберите действие из меню";
-                    sendCustomKeyboard(chat_id, InputType.BASE, out);
                     break;
             }
+        }
+    }
+
+    private void sendMessage(Long chat_id, String command) {
+        String out = "";
+        if (command.equalsIgnoreCase(SaycheeseConstants.ACTIVE_ORDERS)){
+            out = saycheeseService.constructActiveOrdersText();
+        }else if (command.equalsIgnoreCase(SaycheeseConstants.ADD_ORDER)){
+            out = saycheeseService.constructAddOrderText();
+        }else{
+            out = saycheeseService.constructDefaultText();
+        }
+        try {
+            SendMessage message = new SendMessage();
+            message.enableMarkdown(true);
+            message.setChatId(chat_id);
+            message.setText(out);
+            execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 

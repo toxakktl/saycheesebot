@@ -11,6 +11,8 @@ public class SaycheeseConstants {
     //Orders submenu
     public static final String ALL_ORDERS = "Все заказы";
     public static final String ACTIVE_ORDERS = "Активные заказы";
+    public static final String ADD_ORDER = "Добавить заказ";
+    public static final String DELETE_ORDER = "Удалить заказ";
 
     //Reports submenu
     public static final String ALL_TIME_REPORT = "Общий отчет";
