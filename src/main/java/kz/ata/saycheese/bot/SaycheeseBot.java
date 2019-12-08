@@ -8,7 +8,6 @@ import kz.ata.saycheese.service.SaycheeseService;
 import kz.ata.saycheese.service.StateService;
 import kz.ata.saycheese.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -40,7 +39,7 @@ public class SaycheeseBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (!checkAccessRights(update.getMessage().getChatId())){
-            sendCustomKeyboard(update.getMessage().getChatId(), InputType.BASE, SaycheeseConstants.ACCESS_DENIED);
+            sendCustomKeyboard(update.getMessage().getChatId(), State.MAIN, SaycheeseConstants.ACCESS_DENIED);
             return;
         }
         if (update.hasMessage() && update.getMessage().hasText()){
@@ -50,30 +49,60 @@ public class SaycheeseBot extends TelegramLongPollingBot {
             String out = "";
             switch (state){
                 case MAIN:
-                    out = "Выберите действие";
-                    stateService.handleStateMain(message, chat_id, states);
-                    sendCustomKeyboard(chat_id, InputType.MAIN, out);
+                    out = stateService.handleStateMain(message, chat_id, states);
+                    sendCustomKeyboard(chat_id, states.get(chat_id), out);
                     break;
+                //Orders part
                 case ORDERS:
-                    out = "Выберите заказы";
+                case ACTIVE_ORDERS:
+                case ALL_ORDER:
                     stateService.handleStateOrders(message, chat_id, states);
-                    sendCustomKeyboard(chat_id, InputType.SUBORDERS, out);
+                    sendOrdersDialog(chat_id, states.get(chat_id));
                     break;
+                case ADD_ORDER:
+                    try {
+                        processNewOrder(message);
+                        sendSimpleMessage(chat_id, SaycheeseConstants.ORDER_SAVED);
+                        states.put(chat_id, State.ORDERS);
+                    } catch (TelegramApiException e) {
+                        sendSimpleMessage(chat_id, e.getMessage());
+                    }
+                    break;
+                case DELETE_ORDER:
+                    try {
+                        processDeleteOrder(message);
+                        sendSimpleMessage(chat_id, SaycheeseConstants.ORDER_DELETED);
+                        states.put(chat_id, State.ORDERS);
+                    } catch (TelegramApiException e) {
+                        sendSimpleMessage(chat_id, e.getMessage());
+                    }
+                    break;
+                case COMPLETE_ORDER:
+                    try {
+                        processCompleteOrder(message);
+                        sendSimpleMessage(chat_id, SaycheeseConstants.ORDER_COMPETED);
+                        states.put(chat_id, State.ORDERS);
+                    } catch (TelegramApiException e) {
+                        sendSimpleMessage(chat_id, e.getMessage());
+                    }
+                    break;
+
                 case STORAGE:
                     out = "Выберите действие со складом";
                     stateService.handleStateStorage(message, chat_id, states);
-                    sendCustomKeyboard(chat_id, InputType.SUBSTORAGE, out);
+                    sendCustomKeyboard(chat_id, State.SUBSTORAGE, out);
                     break;
                 case SELL:
                     out = "Выберите чизкейк";
                     states.put(chat_id, State.SELL_PROCESSING);
-                    sendCustomKeyboard(chat_id, InputType.SUBSELLS, out);
+                    sendCustomKeyboard(chat_id, states.get(chat_id), out);
                     break;
                 case REPORTS:
                     out = "Выберите период отчетности";
                     stateService.handleStateReports(message, chat_id, states);
-                    sendCustomKeyboard(chat_id, InputType.SUBREPORTS, out);
+                    sendCustomKeyboard(chat_id, State.SUBREPORTS, out);
                     break;
+
 //
 //                case SELL_PROCESSING:
 //                    out = "Выберан " + message + ". Введите вес в кг. Пример: 1.4";
@@ -88,10 +117,27 @@ public class SaycheeseBot extends TelegramLongPollingBot {
 //                    sendCustomKeyboard(chat_id, InputType.SUBSELLS, out);
 //                    break;
                 default:
+                    out = "Выберите действие";
+                    stateService.handleStateMain(message, chat_id, states);
+                    sendCustomKeyboard(chat_id, State.MAIN, out);
                     break;
             }
         }
     }
+
+    private void processCompleteOrder(String message) throws TelegramApiException {
+        saycheeseService.completeOrder(message);
+    }
+
+    private void processDeleteOrder(String message) throws TelegramApiException {
+        saycheeseService.deleteOrder(message);
+    }
+
+    private void processNewOrder(String message) throws TelegramApiException {
+        String[] fields = message.split("\\r?\\n");
+        saycheeseService.addOrder(fields);
+    }
+
 
     private State getState(long chat_id) {
         if (states.get(chat_id) == null){
@@ -112,14 +158,20 @@ public class SaycheeseBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendCommandMessage(Long chat_id, String command) {
+    private void sendOrdersDialog(Long chat_id, State state) {
         String out = "";
-        if (command.equalsIgnoreCase(SaycheeseConstants.ACTIVE_ORDERS)){
-            out = saycheeseService.constructActiveOrdersText();
-        }else if (command.equalsIgnoreCase(SaycheeseConstants.ADD_ORDER)){
+        if (state.equals(State.ALL_ORDER)){
+            out = saycheeseService.constructAllOrdersText();
+        }else if (state.equals(State.ACTIVE_ORDERS)){
+            out = saycheeseService.constructActiveOrderText();
+        }else if (state.equals(State.ADD_ORDER)){
             out = saycheeseService.constructAddOrderText();
-        }else{
-            out = saycheeseService.constructDefaultText();
+        }else if (state.equals(State.DELETE_ORDER)){
+            out = saycheeseService.constructDeleteOrderText();
+        }else if (state.equals(State.COMPLETE_ORDER)){
+            out = saycheeseService.constructCompleteOrderText();
+        }else {
+            out = saycheeseService.constructDefaultOrderText();
         }
         try {
             SendMessage message = new SendMessage();
@@ -132,17 +184,17 @@ public class SaycheeseBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendCustomKeyboard(long chatId, InputType type, String msg) {
+    public void sendCustomKeyboard(long chatId, State type, String msg) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(msg);
-        if (type.equals(InputType.SUBORDERS)){
+        if (type.equals(State.ORDERS)){
             message.setReplyMarkup(saycheeseService.createSubordersKeyboard());
-        }else if(type.equals(InputType.SUBSTORAGE)){
+        }else if(type.equals(State.STORAGE)){
             message.setReplyMarkup(saycheeseService.createSubstorageKeyboard());
-        }else if(type.equals(InputType.SUBSELLS)){
+        }else if(type.equals(State.SELL)){
             message.setReplyMarkup(saycheeseService.createSellKeyboard());
-        }else if(type.equals(InputType.SUBREPORTS)){
+        }else if(type.equals(State.REPORTS)){
             message.setReplyMarkup(saycheeseService.createSubreportsKeyboard());
         }else {
             message.setReplyMarkup(saycheeseService.createMainKeyboard());

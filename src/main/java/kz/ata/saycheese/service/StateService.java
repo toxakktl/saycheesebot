@@ -9,28 +9,38 @@ import java.util.Map;
 @Service
 public class StateService {
 
-    public void handleStateMain(String message, Long chat_id, Map<Long, State> states) {
+    public String handleStateMain(String message, Long chat_id, Map<Long, State> states) {
+        String out = "";
         switch (message){
             case SaycheeseConstants.ORDERS:
+                out = "Выберите заказы";
                 states.put(chat_id, State.ORDERS);
                 break;
             case SaycheeseConstants.STORAGE:
+                out = "Выберите действие со складом";
                 states.put(chat_id, State.STORAGE);
                 break;
             case SaycheeseConstants.SELL:
+                out = "Выберите чизкейк";
                 states.put(chat_id, State.SELL);
                 break;
             case SaycheeseConstants.REPORTS:
+                out = "Выберите период отчетности";
                 states.put(chat_id, State.REPORTS);
                 break;
             default:
+                out = "Выберите действие";
                 states.put(chat_id, State.MAIN);
                 break;
         }
+        return out;
     }
 
     public void handleStateOrders(String message, long chat_id, Map<Long, State> states) {
         switch (message){
+            case SaycheeseConstants.ALL_ORDERS:
+                states.put(chat_id, State.ALL_ORDER);
+                break;
             case SaycheeseConstants.ACTIVE_ORDERS:
                 states.put(chat_id, State.ACTIVE_ORDERS);
                 break;
@@ -40,8 +50,11 @@ public class StateService {
             case SaycheeseConstants.DELETE_ORDER:
                 states.put(chat_id, State.DELETE_ORDER);
                 break;
+            case SaycheeseConstants.COMPLETE_ORDER:
+                states.put(chat_id, State.COMPLETE_ORDER);
+                break;
             default:
-                states.put(chat_id, State.MAIN);
+                states.put(chat_id, State.ORDERS_DEFAULT);
                 break;
         }
     }

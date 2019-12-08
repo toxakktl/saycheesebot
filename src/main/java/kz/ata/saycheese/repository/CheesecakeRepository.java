@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CheesecakeRepository extends JpaRepository<CheesecakeModel, Long> {
+
+    CheesecakeModel findByName(String name);
 }

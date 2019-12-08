@@ -16,4 +16,8 @@ public class CheesecakeService {
     public List<CheesecakeModel> findAll(){
         return cheesecakeRepository.findAll();
     }
+
+    public CheesecakeModel findByName(String name){
+        return cheesecakeRepository.findByName(name);
+    }
 }

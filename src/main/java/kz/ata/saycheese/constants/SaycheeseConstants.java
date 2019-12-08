@@ -13,6 +13,12 @@ public class SaycheeseConstants {
     public static final String ACTIVE_ORDERS = "Активные заказы";
     public static final String ADD_ORDER = "Добавить заказ";
     public static final String DELETE_ORDER = "Удалить заказ";
+    public static final String COMPLETE_ORDER = "Выполнить заказ";
+
+    public static final String ORDER_SAVED = "Заказ добавлен";
+    public static final String ORDER_DELETED = "Заказ удален";
+    public static final String ORDER_COMPETED = "Заказ выполнен";
+
 
     //Reports submenu
     public static final String ALL_TIME_REPORT = "Общий отчет";
@@ -27,4 +33,6 @@ public class SaycheeseConstants {
     public static final String BACK = "⏪ Назад";
 
     public static final String ACCESS_DENIED = "\uD83D\uDEAB Ошибка доступа. У вас нет прав на использование бота.";
+
+    public static final String DATE_REGEX = "/^\\d{2}[./-]\\d{2}[./-]\\d{4}$/";
 }

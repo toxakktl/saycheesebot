@@ -30,8 +30,8 @@ public class    OrderModel extends BaseModel{
     @JoinColumn(name = "cheesecake_id")
     private CheesecakeModel cheesecake;
 
-    @Column(name = "quantity")
-    private BigDecimal quantity;
+    @Column(name = "weight")
+    private BigDecimal weight;
 
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
@@ -85,12 +85,12 @@ public class    OrderModel extends BaseModel{
         this.cheesecake = cheesecake;
     }
 
-    public BigDecimal getQuantity() {
-        return quantity;
+    public BigDecimal getWeight() {
+        return weight;
     }
 
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
     }
 
     public OrderState getOrderState() {

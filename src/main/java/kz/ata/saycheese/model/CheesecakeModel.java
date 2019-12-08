@@ -7,7 +7,7 @@ import java.util.Set;
 @Entity
 @Table(name = "cheesecakes")
 @SequenceGenerator(name = "id_gen", sequenceName = "cheesecake_seq", initialValue = 1000, allocationSize = 1)
-public class CheesecakeModel extends BaseModel{
+public class CheesecakeModel extends BaseModel {
 
     @Column(name = "name")
     private String name;
@@ -15,7 +15,7 @@ public class CheesecakeModel extends BaseModel{
     @Column(name = "price_per_kg")
     private BigDecimal pricePerKg;
 
-    @OneToMany(mappedBy = "cheesecake", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "cheesecake", fetch = FetchType.EAGER)
     private Set<OrderModel> order;
 
     public String getName() {
