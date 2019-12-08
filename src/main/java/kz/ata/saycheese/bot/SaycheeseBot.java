@@ -92,6 +92,9 @@ public class SaycheeseBot extends TelegramLongPollingBot {
                     stateService.handleStateStorage(message, chat_id, states);
                     sendCustomKeyboard(chat_id, State.SUBSTORAGE, out);
                     break;
+
+
+
                 case SELL:
                     out = "Выберите чизкейк";
                     states.put(chat_id, State.SELL_PROCESSING);
@@ -172,6 +175,28 @@ public class SaycheeseBot extends TelegramLongPollingBot {
             out = saycheeseService.constructCompleteOrderText();
         }else {
             out = saycheeseService.constructDefaultOrderText();
+        }
+        try {
+            SendMessage message = new SendMessage();
+            message.enableMarkdown(true);
+            message.setChatId(chat_id);
+            message.setText(out);
+            execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendStorageDialog(Long chat_id, State state) {
+        String out = "";
+        if (state.equals(State.ALL_STORAGE)){
+            out = saycheeseService.constructAllStorageText();
+        }else if (state.equals(State.ADD_FOOD)){
+            out = saycheeseService.constructActiveOrderText();
+        }else if (state.equals(State.DELETE_FOOD)){
+            out = saycheeseService.constructAddOrderText();
+        }else {
+            out = saycheeseService.constructDefaultStorageText();
         }
         try {
             SendMessage message = new SendMessage();

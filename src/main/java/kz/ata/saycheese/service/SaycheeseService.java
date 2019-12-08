@@ -4,6 +4,7 @@ import kz.ata.saycheese.constants.SaycheeseConstants;
 import kz.ata.saycheese.enums.OrderState;
 import kz.ata.saycheese.enums.State;
 import kz.ata.saycheese.model.CheesecakeModel;
+import kz.ata.saycheese.model.FoodModel;
 import kz.ata.saycheese.model.OrderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class SaycheeseService {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private StorageService storageService;
 
     @Autowired
     private CheesecakeService cheesecakeService;
@@ -151,6 +155,10 @@ public class SaycheeseService {
         return "Выберите операцию с заказами";
     }
 
+    public String constructDefaultStorageText() {
+        return "Выберите операцию со складом";
+    }
+
     public String constructActiveOrderText() {
         List<OrderModel> activeOrders = orderService.findAllActiveOrders();
         if (CollectionUtils.isEmpty(activeOrders)){
@@ -229,6 +237,16 @@ public class SaycheeseService {
 //        if (!fields[2].matches(SaycheeseConstants.DATE_REGEX)){
 //            throw new TelegramApiException("Неверный формат даты. Введите дату в формате дд.мм.гггг");
 //        }
+    }
+
+    public String constructAllStorageText() {
+        StringBuilder sb = new StringBuilder();
+        List<FoodModel> storage = storageService.findAll();
+        for (FoodModel food: storage){
+            sb.append(food.getName()).append(": ").append(food.getQuantity()).append(food.getUnit()).append("\n")
+                    .append("---------------");
+        }
+        return sb.toString();
     }
 }
 
