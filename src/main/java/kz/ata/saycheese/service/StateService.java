@@ -28,6 +28,7 @@ public class StateService {
                 out = "Выберите период отчетности";
                 states.put(chat_id, State.REPORTS);
                 break;
+            case SaycheeseConstants.HOME:
             default:
                 out = "Выберите действие";
                 states.put(chat_id, State.MAIN);
@@ -64,12 +65,10 @@ public class StateService {
             case SaycheeseConstants.ALL_STORAGE:
                 states.put(chat_id, State.ALL_STORAGE);
                 break;
-            case SaycheeseConstants.ADD_FOOD:
-                states.put(chat_id, State.ADD_FOOD);
+            case SaycheeseConstants.UPDATE_STORAGE:
+                states.put(chat_id, State.UPDATE_STORAGE);
                 break;
-            case SaycheeseConstants.DELETE_FOOD:
-                states.put(chat_id, State.DELETE_FOOD);
-                break;
+            case SaycheeseConstants.HOME:
             default:
                 states.put(chat_id, State.MAIN);
                 break;
@@ -80,12 +79,6 @@ public class StateService {
         switch (message){
             case SaycheeseConstants.ALL_STORAGE:
                 states.put(chat_id, State.ALL_STORAGE);
-                break;
-            case SaycheeseConstants.ADD_FOOD:
-                states.put(chat_id, State.ADD_FOOD);
-                break;
-            case SaycheeseConstants.DELETE_FOOD:
-                states.put(chat_id, State.DELETE_FOOD);
                 break;
             default:
                 states.put(chat_id, State.MAIN);

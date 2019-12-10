@@ -26,11 +26,10 @@ public class SaycheeseConstants {
 
     //Storage submenu
     public static final String ALL_STORAGE = "Все продукты";
-    public static final String ADD_FOOD = "Добавить продукт";
-    public static final String DELETE_FOOD = "Удалить продукт";
+    public static final String UPDATE_STORAGE = "Обновить склад";
 
 
-    public static final String BACK = "⏪ Назад";
+    public static final String HOME = "\uD83C\uDFE0 Главная";
 
     public static final String ACCESS_DENIED = "\uD83D\uDEAB Ошибка доступа. У вас нет прав на использование бота.";
 

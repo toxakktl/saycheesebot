@@ -16,3 +16,17 @@ VALUES (nextval('cheesecake_seq'), 'Фисташковый', '4500');
 INSERT INTO public.cheesecakes(
     id, name, price_per_kg)
 VALUES (nextval('cheesecake_seq'), 'Орео', '5000');
+
+INSERT INTO public.food(id, name, quantity, unit) VALUES (nextval('food_seq'), 'Бананы', 2, 'KG');
+INSERT INTO public.food(id, name, quantity, unit) VALUES (nextval('food_seq'), 'Сливки 33%', 0.5, 'ML');
+INSERT INTO public.food(id, name, quantity, unit) VALUES (nextval('food_seq'), 'Фисташки', 200, 'G');
+INSERT INTO public.food(id, name, quantity, unit) VALUES (nextval('food_seq'), 'Творожный сыр', 1.5, 'KG');
+INSERT INTO public.food(id, name, quantity, unit) VALUES (nextval('food_seq'), 'Масло сливочное', 700, 'G');
+INSERT INTO public.food(id, name, quantity, unit) VALUES (nextval('food_seq'), 'Печенье юбилейное', 900, 'G');
+INSERT INTO public.food(id, name, quantity, unit) VALUES (nextval('food_seq'), 'Яйца', 1.5, 'KG');
+
+
+
+
+
+

@@ -2,7 +2,6 @@ package kz.ata.saycheese.bot;
 
 import kz.ata.saycheese.config.BotConfig;
 import kz.ata.saycheese.constants.SaycheeseConstants;
-import kz.ata.saycheese.enums.InputType;
 import kz.ata.saycheese.enums.State;
 import kz.ata.saycheese.service.SaycheeseService;
 import kz.ata.saycheese.service.StateService;
@@ -46,6 +45,8 @@ public class SaycheeseBot extends TelegramLongPollingBot {
             String message = update.getMessage().getText();
             long chat_id = update.getMessage().getChatId();
             State state = getState(chat_id);
+            if (handleHomeButton(chat_id, message))
+                return;
             String out = "";
             switch (state){
                 case MAIN:
@@ -66,6 +67,7 @@ public class SaycheeseBot extends TelegramLongPollingBot {
                         states.put(chat_id, State.ORDERS);
                     } catch (TelegramApiException e) {
                         sendSimpleMessage(chat_id, e.getMessage());
+                        states.put(chat_id, State.ORDERS);
                     }
                     break;
                 case DELETE_ORDER:
@@ -75,6 +77,7 @@ public class SaycheeseBot extends TelegramLongPollingBot {
                         states.put(chat_id, State.ORDERS);
                     } catch (TelegramApiException e) {
                         sendSimpleMessage(chat_id, e.getMessage());
+                        states.put(chat_id, State.ORDERS);
                     }
                     break;
                 case COMPLETE_ORDER:
@@ -84,16 +87,25 @@ public class SaycheeseBot extends TelegramLongPollingBot {
                         states.put(chat_id, State.ORDERS);
                     } catch (TelegramApiException e) {
                         sendSimpleMessage(chat_id, e.getMessage());
+                        states.put(chat_id, State.ORDERS);
                     }
                     break;
 
+                 //Storage part
                 case STORAGE:
-                    out = "Выберите действие со складом";
+                case ALL_STORAGE:
                     stateService.handleStateStorage(message, chat_id, states);
-                    sendCustomKeyboard(chat_id, State.SUBSTORAGE, out);
+                    sendStorageDialog(chat_id, states.get(chat_id));
                     break;
-
-
+                case UPDATE_STORAGE:
+                    try {
+                        processUpdateStorage(message);
+                        states.put(chat_id, State.STORAGE);
+                    } catch (TelegramApiException e) {
+                        sendSimpleMessage(chat_id, e.getMessage());
+                        states.put(chat_id, State.STORAGE);
+                    }
+                    break;
 
                 case SELL:
                     out = "Выберите чизкейк";
@@ -106,7 +118,6 @@ public class SaycheeseBot extends TelegramLongPollingBot {
                     sendCustomKeyboard(chat_id, State.SUBREPORTS, out);
                     break;
 
-//
 //                case SELL_PROCESSING:
 //                    out = "Выберан " + message + ". Введите вес в кг. Пример: 1.4";
 //                    cheesecakeType.put(chat_id, message);
@@ -126,6 +137,20 @@ public class SaycheeseBot extends TelegramLongPollingBot {
                     break;
             }
         }
+    }
+
+    private boolean handleHomeButton(long chat_id, String message) {
+        if (message.equals(SaycheeseConstants.HOME)){
+            states.put(chat_id, State.MAIN);
+            sendCustomKeyboard(chat_id, State.MAIN, "Выберите действие");
+            return true;
+        }
+        return false;
+    }
+
+    private void processUpdateStorage(String message) throws TelegramApiException {
+        String[] fields = message.split("\\r?\\n");
+        saycheeseService.updateStorage(fields);
     }
 
     private void processCompleteOrder(String message) throws TelegramApiException {
@@ -191,10 +216,8 @@ public class SaycheeseBot extends TelegramLongPollingBot {
         String out = "";
         if (state.equals(State.ALL_STORAGE)){
             out = saycheeseService.constructAllStorageText();
-        }else if (state.equals(State.ADD_FOOD)){
-            out = saycheeseService.constructActiveOrderText();
-        }else if (state.equals(State.DELETE_FOOD)){
-            out = saycheeseService.constructAddOrderText();
+        }else if (state.equals(State.UPDATE_STORAGE)){
+            out = saycheeseService.constructUpdateStorageText();
         }else {
             out = saycheeseService.constructDefaultStorageText();
         }

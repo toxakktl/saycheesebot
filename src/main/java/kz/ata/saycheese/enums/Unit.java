@@ -1,7 +1,19 @@
 package kz.ata.saycheese.enums;
 
 public enum Unit {
-    KG,
-    G,
-    ML
+    KG("кг"),
+    G("г"),
+    ML("мл"),
+    L("л");
+
+    private String value;
+
+    Unit(String value) {
+        this.value = value;
+    }
+
+    public String getValue(){
+        return value;
+    }
+
 }

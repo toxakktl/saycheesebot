@@ -16,4 +16,12 @@ public class FoodService {
     public List<FoodModel> findAllFood(){
         return foodRepository.findAll();
     }
+
+    public FoodModel findByName(String name){
+        return foodRepository.findByName(name);
+    }
+
+    public void save(FoodModel food){
+        foodRepository.save(food);
+    }
 }

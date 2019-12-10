@@ -2,7 +2,7 @@ package kz.ata.saycheese.service;
 
 import kz.ata.saycheese.constants.SaycheeseConstants;
 import kz.ata.saycheese.enums.OrderState;
-import kz.ata.saycheese.enums.State;
+import kz.ata.saycheese.enums.Unit;
 import kz.ata.saycheese.model.CheesecakeModel;
 import kz.ata.saycheese.model.FoodModel;
 import kz.ata.saycheese.model.OrderModel;
@@ -13,12 +13,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SaycheeseService {
@@ -31,6 +33,9 @@ public class SaycheeseService {
 
     @Autowired
     private CheesecakeService cheesecakeService;
+
+    @Autowired
+    private FoodService foodService;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -63,7 +68,7 @@ public class SaycheeseService {
         keyboard.add(row);
         row = new KeyboardRow();
         row.add(SaycheeseConstants.COMPLETE_ORDER);
-        row.add(SaycheeseConstants.BACK);
+        row.add(SaycheeseConstants.HOME);
         keyboard.add(row);
         keyboardMarkup.setKeyboard(keyboard);
         keyboardMarkup.setResizeKeyboard(true);
@@ -78,7 +83,7 @@ public class SaycheeseService {
         row.add(SaycheeseConstants.PERIOD_REPORT);
         keyboard.add(row);
         row = new KeyboardRow();
-        row.add(SaycheeseConstants.BACK);
+        row.add(SaycheeseConstants.HOME);
         keyboard.add(row);
         keyboardMarkup.setKeyboard(keyboard);
         keyboardMarkup.setResizeKeyboard(true);
@@ -92,11 +97,10 @@ public class SaycheeseService {
         row.add(SaycheeseConstants.ALL_STORAGE);
         keyboard.add(row);
         row = new KeyboardRow();
-        row.add(SaycheeseConstants.ADD_FOOD);
-        row.add(SaycheeseConstants.DELETE_FOOD);
+        row.add(SaycheeseConstants.UPDATE_STORAGE);
         keyboard.add(row);
         row = new KeyboardRow();
-        row.add(SaycheeseConstants.BACK);
+        row.add(SaycheeseConstants.HOME);
         keyboard.add(row);
         keyboardMarkup.setKeyboard(keyboard);
         keyboardMarkup.setResizeKeyboard(true);
@@ -113,7 +117,7 @@ public class SaycheeseService {
             keyboard.add(row);
         }
         KeyboardRow row = new KeyboardRow();
-        row.add(SaycheeseConstants.BACK);
+        row.add(SaycheeseConstants.HOME);
         keyboard.add(row);
         keyboardMarkup.setKeyboard(keyboard);
         keyboardMarkup.setResizeKeyboard(true);
@@ -133,7 +137,7 @@ public class SaycheeseService {
     public String constructAddOrderText() {
         StringBuilder sb = new StringBuilder();
         sb.append("*Введите заказ в формате*: ").append("\n").
-        append("Имя кклиента\n").
+                append("Имя кклиента\n").
                 append("Адрес\n").
                 append("Дата доставки в формате дд.мм.гггг\n").
                 append("Название чизкейка маленькими буквами\n").
@@ -211,7 +215,7 @@ public class SaycheeseService {
         if (order.isPresent()){
             orderService.deleteOrder(order.get());
         }else{
-          throw new TelegramApiException("Заказ с номером " + orderId + " не найден.");
+            throw new TelegramApiException("Заказ с номером " + orderId + " не найден.");
         }
     }
 
@@ -239,14 +243,46 @@ public class SaycheeseService {
 //        }
     }
 
+
     public String constructAllStorageText() {
         StringBuilder sb = new StringBuilder();
         List<FoodModel> storage = storageService.findAll();
         for (FoodModel food: storage){
-            sb.append(food.getName()).append(": ").append(food.getQuantity()).append(food.getUnit()).append("\n")
-                    .append("---------------");
+            sb.append(food.getName()).append(": ").append(food.getQuantity()).append(" ").append(food.getUnit().getValue()).append("\n");
         }
         return sb.toString();
+    }
+
+    public String constructUpdateStorageText() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("*Обновите количество продуктов в формате*: ").append("\n").
+                append("Название продукта (название должно совпадать с названием с результата Все продукты)\n").
+                append("Количсетво\n").
+                append("Единица измерения (KG, G, ML, L)\n\n").
+                append("*Пример: *\n").
+                append("Бананы\n3\nKG");
+        return sb.toString();
+    }
+
+    public String constructDeleteFoodText() {
+        return "none";
+    }
+
+    public void updateStorage(String[] fields) throws TelegramApiException {
+        validateStorageFields(fields);
+        FoodModel foodModel = foodService.findByName(fields[0]);
+        if (foodModel == null){
+            throw new TelegramApiException("Продукт не найден. ");
+        }
+        foodModel.setQuantity(new BigDecimal(fields[1]));
+        foodModel.setUnit(Unit.valueOf(fields[2]));
+        foodService.save(foodModel);
+    }
+
+    private void validateStorageFields(String[] fields) throws TelegramApiException {
+        if (fields.length <= 0 || fields.length > 3){
+            throw new TelegramApiException("Неверный формат полей. Необходимо, чтобы было 5 полей.");
+        }
     }
 }
 
