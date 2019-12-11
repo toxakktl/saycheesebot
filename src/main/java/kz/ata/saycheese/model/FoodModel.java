@@ -4,6 +4,7 @@ import kz.ata.saycheese.enums.Unit;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Entity
 @Table(name = "food")
@@ -19,6 +20,9 @@ public class FoodModel extends BaseModel {
     @Column(name = "unit")
     @Enumerated(EnumType.STRING)
     private Unit unit;
+
+    @OneToOne(mappedBy = "food")
+    private IngredientModel ingredient;
 
     public String getName() {
         return name;
@@ -42,5 +46,13 @@ public class FoodModel extends BaseModel {
 
     public void setUnit(Unit unit) {
         this.unit = unit;
+    }
+
+    public IngredientModel getIngredient() {
+        return ingredient;
+    }
+
+    public void setIngredient(IngredientModel ingredient) {
+        this.ingredient = ingredient;
     }
 }

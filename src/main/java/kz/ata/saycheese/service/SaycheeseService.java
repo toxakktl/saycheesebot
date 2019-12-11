@@ -3,9 +3,7 @@ package kz.ata.saycheese.service;
 import kz.ata.saycheese.constants.SaycheeseConstants;
 import kz.ata.saycheese.enums.OrderState;
 import kz.ata.saycheese.enums.Unit;
-import kz.ata.saycheese.model.CheesecakeModel;
-import kz.ata.saycheese.model.FoodModel;
-import kz.ata.saycheese.model.OrderModel;
+import kz.ata.saycheese.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -47,7 +45,7 @@ public class SaycheeseService {
         row.add(SaycheeseConstants.STORAGE);
         keyboard.add(row);
         row = new KeyboardRow();
-        row.add(SaycheeseConstants.SELL);
+        row.add(SaycheeseConstants.COOK);
         row.add(SaycheeseConstants.REPORTS);
         keyboard.add(row);
         keyboardMarkup.setKeyboard(keyboard);
@@ -107,7 +105,7 @@ public class SaycheeseService {
         return keyboardMarkup;
     }
 
-    public ReplyKeyboard createSellKeyboard(){
+    public ReplyKeyboard createCookKeyboard(){
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         List<KeyboardRow> keyboard = new ArrayList<>();
         List<CheesecakeModel> cheesecakes = cheesecakeService.findAll();
@@ -283,6 +281,21 @@ public class SaycheeseService {
         if (fields.length <= 0 || fields.length > 3){
             throw new TelegramApiException("Неверный формат полей. Необходимо, чтобы было 5 полей.");
         }
+    }
+
+    public String constructRecipe(String message, String cheesecake) throws TelegramApiException {
+        BigDecimal qty = new BigDecimal(message);
+        CheesecakeModel cheesecakeModel = cheesecakeService.findByName(cheesecake);
+        if (cheesecakeModel == null){
+            throw new TelegramApiException("Выбранный чизкейк не найден.");
+        }
+        StringBuilder sb = new StringBuilder();
+        RecipeModel recipe = cheesecakeModel.getRecipe();
+        for (RecipeIngredientModel rec: recipe.getIngredients()){
+            IngredientModel ingredient = rec.getIngredient();
+            sb.append(ingredient.getFood().getName()).append(" ").append(rec.getQuantiy().multiply(qty)).append(" ").append(rec.getUnit().getValue()).append("\n");
+        }
+        return sb.toString();
     }
 }
 

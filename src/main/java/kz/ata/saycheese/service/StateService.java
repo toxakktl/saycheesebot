@@ -20,9 +20,9 @@ public class StateService {
                 out = "Выберите действие со складом";
                 states.put(chat_id, State.STORAGE);
                 break;
-            case SaycheeseConstants.SELL:
+            case SaycheeseConstants.COOK:
                 out = "Выберите чизкейк";
-                states.put(chat_id, State.SELL);
+                states.put(chat_id, State.COOK);
                 break;
             case SaycheeseConstants.REPORTS:
                 out = "Выберите период отчетности";
@@ -75,15 +75,8 @@ public class StateService {
         }
     }
 
-    public void handleStateSell(String message, long chat_id, Map<Long, State> states) {
-        switch (message){
-            case SaycheeseConstants.ALL_STORAGE:
-                states.put(chat_id, State.ALL_STORAGE);
-                break;
-            default:
-                states.put(chat_id, State.MAIN);
-                break;
-        }
+    public void handleStateCook(String message, long chat_id, Map<Long, State> states) {
+        states.put(chat_id, State.COOK_PROCESSING);
     }
     public void handleStateReports(String message, long chat_id, Map<Long, State> states) {
         switch (message){

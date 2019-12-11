@@ -5,7 +5,7 @@ public class SaycheeseConstants {
     //Main commands
     public static final String ORDERS = "\uD83D\uDCDD Заказы";
     public static final String STORAGE = "\uD83D\uDCC2 Склад";
-    public static final String SELL = "\uD83C\uDF70 Приготовить";
+    public static final String COOK = "\uD83C\uDF70 Приготовить";
     public static final String REPORTS = "\uD83D\uDCC8 Отчеты";
 
     //Orders submenu

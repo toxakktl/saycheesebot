@@ -18,6 +18,10 @@ public class CheesecakeModel extends BaseModel {
     @OneToMany(mappedBy = "cheesecake", fetch = FetchType.EAGER)
     private Set<OrderModel> order;
 
+    @OneToOne
+    @JoinColumn(name = "recipe_id", referencedColumnName = "id")
+    private RecipeModel recipe;
+
     public String getName() {
         return name;
     }
@@ -40,5 +44,13 @@ public class CheesecakeModel extends BaseModel {
 
     public void setOrder(Set<OrderModel> order) {
         this.order = order;
+    }
+
+    public RecipeModel getRecipe() {
+        return recipe;
+    }
+
+    public void setRecipe(RecipeModel recipe) {
+        this.recipe = recipe;
     }
 }

@@ -14,7 +14,10 @@ public class RecipeModel extends BaseModel {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "recipe")
+    private CheesecakeModel cheesecake;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<RecipeIngredientModel> ingredients;
 
     public String getName() {
@@ -39,5 +42,13 @@ public class RecipeModel extends BaseModel {
 
     public void setIngredients(Set<RecipeIngredientModel> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    public CheesecakeModel getCheesecake() {
+        return cheesecake;
+    }
+
+    public void setCheesecake(CheesecakeModel cheesecake) {
+        this.cheesecake = cheesecake;
     }
 }

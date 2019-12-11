@@ -18,6 +18,10 @@ public class IngredientModel extends BaseModel {
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)
     private Set<RecipeIngredientModel> recipesAssoc = new HashSet<>();
 
+    @OneToOne
+    @JoinColumn(name = "food_id", referencedColumnName = "id")
+    private FoodModel food;
+
     public String getName() {
         return name;
     }
@@ -40,5 +44,13 @@ public class IngredientModel extends BaseModel {
 
     public void setRecipesAssoc(Set<RecipeIngredientModel> recipesAssoc) {
         this.recipesAssoc = recipesAssoc;
+    }
+
+    public FoodModel getFood() {
+        return food;
+    }
+
+    public void setFood(FoodModel food) {
+        this.food = food;
     }
 }

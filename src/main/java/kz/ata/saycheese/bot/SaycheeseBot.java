@@ -107,11 +107,24 @@ public class SaycheeseBot extends TelegramLongPollingBot {
                     }
                     break;
 
-                case SELL:
-                    out = "Выберите чизкейк";
-                    states.put(chat_id, State.SELL_PROCESSING);
-                    sendCustomKeyboard(chat_id, states.get(chat_id), out);
+                 //cook
+                case COOK:
+                    stateService.handleStateCook(message, chat_id, states);
+                    cheesecakeType.put(chat_id, message);
+                    sendSimpleMessage(chat_id, "Чизкейк выбран. Введите количество в кг.");
                     break;
+                case COOK_PROCESSING:
+                    try {
+                        processCheesecakePreparation(chat_id, message, cheesecakeType);
+                        states.put(chat_id, State.COOK);
+                    } catch (TelegramApiException e) {
+                        sendSimpleMessage(chat_id, e.getMessage());
+                        states.put(chat_id, State.COOK);
+                    }
+                    break;
+
+
+
                 case REPORTS:
                     out = "Выберите период отчетности";
                     stateService.handleStateReports(message, chat_id, states);
@@ -137,6 +150,11 @@ public class SaycheeseBot extends TelegramLongPollingBot {
                     break;
             }
         }
+    }
+
+    private void processCheesecakePreparation(long chat_id, String message, Map<Long, String> cheesecakeType) throws TelegramApiException {
+        String text = saycheeseService.constructRecipe(message, cheesecakeType.get(chat_id));
+        sendSimpleMessage(chat_id, text);
     }
 
     private boolean handleHomeButton(long chat_id, String message) {
@@ -240,8 +258,8 @@ public class SaycheeseBot extends TelegramLongPollingBot {
             message.setReplyMarkup(saycheeseService.createSubordersKeyboard());
         }else if(type.equals(State.STORAGE)){
             message.setReplyMarkup(saycheeseService.createSubstorageKeyboard());
-        }else if(type.equals(State.SELL)){
-            message.setReplyMarkup(saycheeseService.createSellKeyboard());
+        }else if(type.equals(State.COOK)){
+            message.setReplyMarkup(saycheeseService.createCookKeyboard());
         }else if(type.equals(State.REPORTS)){
             message.setReplyMarkup(saycheeseService.createSubreportsKeyboard());
         }else {
