@@ -16,4 +16,8 @@ public class UserService {
     public List<Long> findAllUserIds(){
         return userRepository.findAll().stream().map(u->u.getTelegramId()).collect(Collectors.toList());
     }
+
+    public boolean checkAccessRights(Long chatId) {
+        return findAllUserIds().contains(chatId);
+    }
 }

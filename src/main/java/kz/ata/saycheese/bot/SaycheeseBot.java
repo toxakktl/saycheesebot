@@ -37,7 +37,7 @@ public class SaycheeseBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (!checkAccessRights(update.getMessage().getChatId())){
+        if (!userService.checkAccessRights(update.getMessage().getChatId())){
             sendCustomKeyboard(update.getMessage().getChatId(), State.MAIN, SaycheeseConstants.ACCESS_DENIED);
             return;
         }
@@ -270,10 +270,6 @@ public class SaycheeseBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-    }
-
-    private boolean checkAccessRights(Long chatId) {
-        return userService.findAllUserIds().contains(chatId);
     }
 
     @Override
