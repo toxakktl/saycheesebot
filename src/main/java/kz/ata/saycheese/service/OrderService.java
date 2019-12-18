@@ -30,7 +30,7 @@ public class OrderService {
         orderRepository.delete(orderModel);
     }
 
-    Optional<OrderModel> findById(Long id){
+    public Optional<OrderModel> findById(Long id){
         return orderRepository.findById(id);
     }
 }

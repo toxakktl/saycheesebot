@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ public class CustomManager {
     @Autowired
     private ReportManager reportManager;
 
-    public void sendCustomKeyboard(long chatId, State type, String msg) {
+    public SendMessage sendCustomKeyboard(long chatId, State type, String msg) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(msg);
@@ -40,11 +39,7 @@ public class CustomManager {
         }else {
             message.setReplyMarkup(createMainKeyboard());
         }
-//        try {
-//            execute(message);
-//        } catch (TelegramApiException e) {
-//            e.printStackTrace();
-//        }
+        return message;
     }
 
     public ReplyKeyboard createMainKeyboard() {
