@@ -1,5 +1,7 @@
 package kz.ata.saycheese.constants;
 
+import java.text.SimpleDateFormat;
+
 public class SaycheeseConstants {
 
     //Main commands
@@ -28,10 +30,14 @@ public class SaycheeseConstants {
     public static final String ALL_STORAGE = "Все продукты";
     public static final String UPDATE_STORAGE = "Обновить склад";
 
+    //Cooking
+    public static final String CHESECAKE_SELECTED =  "Чизкейк выбран. Введите количество в кг.";
+
 
     public static final String HOME = "\uD83C\uDFE0 Главная";
 
     public static final String ACCESS_DENIED = "\uD83D\uDEAB Ошибка доступа. У вас нет прав на использование бота.";
 
     public static final String DATE_REGEX = "/^\\d{2}[./-]\\d{2}[./-]\\d{4}$/";
+    public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 }
