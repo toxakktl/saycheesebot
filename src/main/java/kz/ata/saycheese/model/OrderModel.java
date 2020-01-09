@@ -9,7 +9,7 @@ import java.util.Date;
 @Entity
 @Table(name = "orders")
 @SequenceGenerator(name = "id_gen", sequenceName = "order_seq", initialValue = 1000, allocationSize = 1)
-public class    OrderModel extends BaseModel{
+public class OrderModel extends BaseModel{
 
     @Column(name = "customer_name")
     private String customerName;
@@ -26,7 +26,7 @@ public class    OrderModel extends BaseModel{
     @Column(name = "price")
     private BigDecimal price;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "cheesecake_id")
     private CheesecakeModel cheesecake;
 

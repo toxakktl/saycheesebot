@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public class OrderManager {
         return keyboardMarkup;
     }
 
+    @Transactional
     public SendMessage sendOrdersDialog(Long chat_id, State state) {
         String out;
         if (state.equals(State.ALL_ORDER)){

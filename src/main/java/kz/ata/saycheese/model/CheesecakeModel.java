@@ -14,9 +14,9 @@ public class CheesecakeModel extends BaseModel {
 
     @Column(name = "price_per_kg")
     private BigDecimal pricePerKg;
-
-    @OneToMany(mappedBy = "cheesecake", fetch = FetchType.EAGER)
-    private Set<OrderModel> order;
+//
+//    @OneToMany(mappedBy = "cheesecake", fetch = FetchType.EAGER)
+//    private Set<OrderModel> order;
 
     @OneToOne
     @JoinColumn(name = "recipe_id", referencedColumnName = "id")
@@ -38,13 +38,13 @@ public class CheesecakeModel extends BaseModel {
         this.pricePerKg = pricePerKg;
     }
 
-    public Set<OrderModel> getOrder() {
-        return order;
-    }
-
-    public void setOrder(Set<OrderModel> order) {
-        this.order = order;
-    }
+//    public Set<OrderModel> getOrder() {
+//        return order;
+//    }
+//
+//    public void setOrder(Set<OrderModel> order) {
+//        this.order = order;
+//    }
 
     public RecipeModel getRecipe() {
         return recipe;
